@@ -8,8 +8,9 @@ function sde_videos_table_creator()
             CREATE TABLE $table_name(
 
             id mediumint(11) NOT NULL AUTO_INCREMENT,
+            ordem varchar(10) NOT NULL,
             url varchar(100) NOT NULL,
-            desc varchar(100) NOT NULL,
+            descricao varchar(100) NOT NULL,
 
             PRIMARY KEY id(id)
             )$charset_collate;";
@@ -33,7 +34,8 @@ function SDE_lista_videos()
     if (isset($_REQUEST['submit'])) {
         $wpdb->insert("$table_name", [
             'url' => $_REQUEST['url'],
-            'desc' => $_REQUEST['desc']
+            'ordem' => $_REQUEST['ordem'],
+            'descricao' => $_REQUEST['descricao']
         ]);
 
         if ($wpdb->insert_id > 0) {
@@ -50,9 +52,15 @@ function SDE_lista_videos()
         <form method="post">
             <div class="cont">
                 <div class="esq">
+                    <span>Ordem de Exibição</span>
+                </div>
+                <input type="text" name="ordem" required><br>
+            </div>
+            <div class="cont">
+                <div class="esq">
                     <span>Descrição</span>
                 </div>
-                <input type="text" name="desc" required><br>
+                <input type="text" name="descricao" required><br>
             </div>
             <div class="cont">
                 <div class="esq">
@@ -73,15 +81,15 @@ function SDE_lista_videos()
     <?php 
 
     $table_name = $wpdb->prefix . 'videos_programa';
-    $employee_list = $wpdb->get_results($wpdb->prepare("select * FROM $table_name ORDER BY desc asc "), ARRAY_A);
+    $employee_list = $wpdb->get_results($wpdb->prepare("select * FROM $table_name ORDER BY ordem asc "), ARRAY_A);
     if (count($employee_list) > 0): ?>  
 
-        <div class="busca">
+        <!-- <div class="busca">
             <h3 class="subtitle">Realize a busca da unidade</h3>
             <input type="text" class="form-control" id="live_search" autocomplete="off" placeholder="Ex.: URL">
         </div>   
         <div id="searchresult" style="margin: 24px 10px 0 0; display: block;"></div>
-        <script  src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script  src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
 
         <script type="text/javascript">
             $(document).ready(function(){
@@ -120,6 +128,7 @@ function sde_videos_resultado_busca($employee_list){?>
     <table border="1" cellpadding="5" width="100%">
         <tr>
             <th>ID</th>
+            <th>Ordem de Exibição</th> 
             <th>Descrição</th>            
             <th>URL</th>
 
@@ -130,7 +139,8 @@ function sde_videos_resultado_busca($employee_list){?>
         foreach ($employee_list as $index => $employee): ?>
             <tr>
                 <td><?php echo $i++; ?></td>
-                <td><?php echo $employee['desc']; ?></td>
+                <td><?php echo $employee['ordem']; ?></td>
+                <td><?php echo $employee['descricao']; ?></td>
                 <td><?php echo $employee['url']; ?></td>
 
                 <td><a href="admin.php?page=update-videos&id=<?php echo $employee['id']; ?>" class="btn-editar">EDITAR</a></td>
@@ -157,12 +167,18 @@ function videos_da_emp_update_call()
    <div class="content-pat">
         <h1 class="title">PAT - Unidades</h1>
         <h2 class="subtitle">Atualização de Cadastro de Unidade</h2>
-        <form method="post">     
+        <form method="post"> 
+            <div class="cont">
+                <div class="esq">
+                    <span>Ordem de exibição</span>
+                </div>
+                <input type="text" name="ordem" value="<?php echo $employee_details['ordem']; ?>" required><br>
+            </div>     
             <div class="cont">
                 <div class="esq">
                     <span>Descrição</span>
                 </div>
-                <input type="text" name="desc" value="<?php echo $employee_details['desc']; ?>" required><br>
+                <input type="text" name="descricao" value="<?php echo $employee_details['descricao']; ?>" required><br>
             </div>  
             <div class="cont">
                 <div class="esq">
@@ -182,7 +198,9 @@ function videos_da_emp_update_call()
                         if (isset($_REQUEST['update'])) {
                             if (!empty($id)) {
                                 $wpdb->update("$table_name", [
-                                    "url" => $_REQUEST['url']           
+                                    "url" => $_REQUEST['url'],
+                                    "ordem" => $_REQUEST['ordem'],
+                                    "descricao" => $_REQUEST['descricao']           
                             ], ["id" => $id]);
                                 $msg = 'Atualização realizada!';
                                 echo '<h4 class="alert">    '. $msg .'</h4>';
